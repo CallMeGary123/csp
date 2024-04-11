@@ -1,6 +1,6 @@
 import pygame
 import random
-
+LOG = False
 # Initialize pygame
 pygame.init()
 
@@ -9,9 +9,10 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 dt = 0
-targets = 8  # Number of targets
-sensors = 16  # number of sensors
+targets = 3  # Number of targets
+sensors = 9  # number of sensors
 threshold_distance = 200  # Minimum distance between sensors
+font = pygame.font.Font(None, 25)
 # Create target positions
 target_positions = []
 sensors_positions = []
@@ -29,7 +30,9 @@ for i in range(sensors):
         if not overlap:
             sensors_positions.append(new_sensor_pos)
             break
-
+if LOG:        
+    for i, pos in enumerate(sensors_positions):
+        print(f"Sensor {i}: ({round(pos.x)}, {round(pos.y)})")
 for i in range(targets):
     target_positions.append(
         pygame.Vector2(
@@ -48,18 +51,34 @@ for i in range(targets):
 direction_change_timers = [0] * targets
 direction_change_interval = 2.5  # Change direction every 2.5 seconds
 
+# Create a custom event for printing target positions
+PRINT_TARGETS_EVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(PRINT_TARGETS_EVENT, 500)
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == PRINT_TARGETS_EVENT:
+            # Print target positions to the terminal
+            if LOG:
+                for i, pos in enumerate(target_positions):
+                    print(f"Target {i}: ({round(pos.x)}, {round(pos.y)})")
     # Fill the screen with purple
     screen.fill((34, 39, 46))
     # Draw the circles
-    for i in range(sensors):
+    for i,pos in enumerate(sensors_positions):
         pygame.draw.circle(screen, (76, 145, 204), sensors_positions[i], 15)
-    for i in range(targets):
+        text_surface = font.render(str(i), True, (255, 255, 255))  # White text
+        text_rect = text_surface.get_rect(center=pos)
+        screen.blit(text_surface, text_rect)
+
+    for i, pos in enumerate(target_positions):
         pygame.draw.circle(screen, (195, 124, 63), target_positions[i], 20)
         target_positions[i] += movement_directions[i] * 100 * dt
+        text_surface = font.render(str(i), True, (255, 255, 255))  # White text
+        text_rect = text_surface.get_rect(center=pos)
+        screen.blit(text_surface, text_rect)
         # Check if the circle hits the screen edge
         if (
             target_positions[i].x < 40
