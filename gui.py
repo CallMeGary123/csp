@@ -12,6 +12,10 @@ THRESHOLD_DISTANCE = 200  # Minimum distance between sensors
 RANGE = 360 # Sensor range
 DIRECTION_CHANGE_INTERVAL = 2.5  # Change direction every 2.5 seconds
 RATE = 500 # ms
+TEXT_COLOR = (255, 255, 255)
+SENSOR_COLOR = (76, 145, 204)
+TARGET_COLOR = (195, 124, 63)
+RANGE_COLOR = (220, 189, 240)
 ######### SETTINGS #########
 
 # Initialize pygame
@@ -96,25 +100,25 @@ while running:
                 print("Target positions:")
                 for i, pos in enumerate(target_positions):
                     print(f"Target {i}: ({round(pos.x)}, {round(pos.y)})")
-    # Fill the screen with purple
+    # Fill the screen 
     screen.fill((34, 39, 46))
     # Draw the circles
     for i,pos in enumerate(sensors_positions):
-        pygame.draw.circle(screen, (76, 145, 204), sensors_positions[i], 15)
+        pygame.draw.circle(screen, SENSOR_COLOR, sensors_positions[i], 15)
         if SHOW_SENSOR_RANGE:
-            pygame.draw.circle(screen, (220, 189, 240), sensors_positions[i], RANGE,width=3)
+            pygame.draw.circle(screen, RANGE_COLOR, sensors_positions[i], RANGE,width=3)
         
         # Add id to sensors
-        text_surface = font.render(str(i), True, (255, 255, 255))  # White text
+        text_surface = font.render(str(i), True, TEXT_COLOR)  # White text
         text_rect = text_surface.get_rect(center=pos)
         screen.blit(text_surface, text_rect)
 
     for i, pos in enumerate(target_positions):
-        pygame.draw.circle(screen, (195, 124, 63), target_positions[i], 20)
+        pygame.draw.circle(screen, TARGET_COLOR, target_positions[i], 20)
         target_positions[i] += movement_directions[i] * SPEED * dt 
         
         # Add id to targets
-        text_surface = font.render(str(i), True, (255, 255, 255))  # White text
+        text_surface = font.render(str(i), True, TEXT_COLOR)  # White text
         text_rect = text_surface.get_rect(center=pos)
         screen.blit(text_surface, text_rect)
         # Check if the circle hits the screen edge
