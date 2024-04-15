@@ -5,7 +5,7 @@ import numpy as np
 ######### SETTINGS #########
 LOG = False
 SHOW_SENSOR_RANGE = False
-SPEED = 69  # pixels per second
+SPEED = 60  # pixels per second
 TARGETS = 5  # Number of targets
 SENSORS = 15  # number of sensors
 THRESHOLD_DISTANCE = 200  # Minimum distance between sensors
@@ -16,6 +16,8 @@ TEXT_COLOR = (255, 255, 255)
 SENSOR_COLOR = (76, 145, 204)
 TARGET_COLOR = (195, 124, 63)
 RANGE_COLOR = (220, 189, 240)
+BACKGROUND_COLOR = (34, 39, 46)
+DISPLAY = (1280, 720)
 ######### SETTINGS #########
 
 # Initialize pygame
@@ -23,7 +25,7 @@ pygame.init()
 font = pygame.font.Font(None, 25)
 
 # Set up the screen
-screen = pygame.display.set_mode((1280, 720))
+screen = pygame.display.set_mode(DISPLAY)
 clock = pygame.time.Clock()
 running = True
 dt = 0
@@ -101,7 +103,7 @@ while running:
                 for i, pos in enumerate(target_positions):
                     print(f"Target {i}: ({round(pos.x)}, {round(pos.y)})")
     # Fill the screen 
-    screen.fill((34, 39, 46))
+    screen.fill(BACKGROUND_COLOR)
     # Draw the circles
     for i,pos in enumerate(sensors_positions):
         pygame.draw.circle(screen, SENSOR_COLOR, sensors_positions[i], 15)
