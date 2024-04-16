@@ -17,6 +17,13 @@ visibility = [
  [1, 1, 0],
  [1, 1, 0]]
 
+visibility3 = [
+ [0, 0, 0],
+ [1, 0, 1],
+ [1, 0, 1],
+ [1, 0, 1],
+ [0, 0, 0],
+ [0, 0, 0]]
 
 
 
@@ -39,7 +46,10 @@ def generate_groupings(matrix):
     return all_groupings
 
 def generate_candidates(groupings):
-    min_length = min(len(sublist) for sublist in groupings)
+    min_length = float("inf")
+    for sublist in groupings:
+        if len(sublist) < min_length and len(sublist) != 0:
+            min_length = len(sublist)
     indices = [index for index, sublist in enumerate(groupings) if len(sublist) == min_length]
 
     return indices
@@ -48,11 +58,15 @@ def conflict_score(item1, item2):
     return len(set(item1) & set(item2))
 
 def valid_choices(sublists,main_list):
+    #print(sublists)
     filtered_sublists = []
     for sublist in sublists:
-        valid_options = [item for item in sublist if item in main_list]
-        if valid_options:
-            filtered_sublists.append(valid_options)
+        if sublist == []:
+            filtered_sublists.append(sublist)
+        else:
+            valid_options = [item for item in sublist if item in main_list]
+            if valid_options:
+                filtered_sublists.append(valid_options)
     return filtered_sublists
 
 def min_conflict(choices):
@@ -79,16 +93,23 @@ def optimal_choices(choices, indexes, min_conflict_score):
                             optimal_choices.append((i,item1))
                             optimal_choices.append((j,item2))
                         elif score == min_conflict_score != 0 and (i,item1) not in optimal_choices:
-                            print(item1, item2, score)
                             optimal_choices.append((i,item1))
+            elif i==j and len(indexes) == 1: 
+                for item in list:
+                    optimal_choices.append((i,item))
     return(optimal_choices)
 def get_choices(visibility, sesnor_groups):
     visibility_t = np.transpose(visibility)
     candidate_groups = generate_groupings(visibility_t)
+    #print(candidate_groups)
     candidates = generate_candidates(candidate_groups)
+    #print(candidates)
     valid = valid_choices(candidate_groups, sesnor_groups)
+    #print(valid)
     mini = min_conflict(valid)
+    #print(mini)
     optimal = optimal_choices(valid, candidates, mini)
+    #print(optimal)
     return optimal
 def generate_array_with_ones(x, positions):
     # Create an array of zeros with length x
@@ -135,12 +156,26 @@ root = Node(parent=None, visibility_matrix=visibility, sensor_groups=sensor_grou
 #print(root.visibility_matrix)
 #print(root.solution)
 #print(root.depth)
-del sensor_groups[sensor_groups.index((0, 4, 5))]
-node1 = Node(parent=root, visibility_matrix=transition(visibility, root.optimal_choices[0]), sensor_groups= sensor_groups, depth=root.depth + 1,solution= update_solution(root.solution, root.optimal_choices[0]))
+#del sensor_groups[sensor_groups.index((0, 4, 5))]
+updated_sensor_groups = list(sensor_groups)
+updated_sensor_groups.remove(root.optimal_choices[0][1])
+node1 = Node(parent=root, visibility_matrix=transition(visibility, root.optimal_choices[0]), sensor_groups= updated_sensor_groups, depth=root.depth + 1,solution= update_solution(root.solution, root.optimal_choices[0]))
 
-print(node1.optimal_choices)
-print(node1.parent)
-print(node1.sensor_groups)
-print(node1.visibility_matrix)
-print(node1.solution)
-print(node1.depth)
+#print(node1.optimal_choices)
+#print(node1.parent.sensor_groups)
+#print(node1.sensor_groups)
+#print(node1.visibility_matrix)
+#print(node1.solution)
+#print(node1.depth)
+
+
+updated_sensor_groups1 = list(updated_sensor_groups)
+updated_sensor_groups1.remove(node1.optimal_choices[0][1])
+node2 = Node(parent=node1, visibility_matrix=transition(node1.visibility_matrix, node1.optimal_choices[0]), sensor_groups= updated_sensor_groups1, depth=node1.depth + 1, solution= update_solution(node1.solution, node1.optimal_choices[0]))
+
+print(node2.optimal_choices)
+print(node2.parent.sensor_groups)
+print(node2.sensor_groups)
+print(node2.visibility_matrix)
+print(node2.solution)
+print(node2.depth)
