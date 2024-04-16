@@ -14,7 +14,6 @@ visibility = [
  [1, 1, 0],
  [1, 1, 0]]
 
-import enum
 from itertools import combinations
 import numpy as np
 
@@ -63,6 +62,7 @@ def min_conflict(choices):
                         score = conflict_score(item1, item2)
                         min_conflict_score = min(min_conflict_score, score)
     return min_conflict_score
+
 def optimal_choices(choices, indexes, min_conflict_score):
     optimal_choices = []
     for i in indexes:
@@ -73,13 +73,11 @@ def optimal_choices(choices, indexes, min_conflict_score):
                     other_list = choices[j]
                     for item2 in other_list:
                         score = conflict_score(item1, item2)
-                        if score == min_conflict_score == 0 and (i,item1) not in optimal_choices and (j,item2) not in optimal_choices:
+                        if score == min_conflict_score  and (i,item1) not in optimal_choices:
                             optimal_choices.append((i,item1))
-                            optimal_choices.append((j,item2))
-                        elif score == min_conflict_score != 0 and (i,item1) not in optimal_choices:
-                            print(item1, item2, score)
-                            optimal_choices.append((i,item1))
+
     return(optimal_choices)
+
 def identify_targets(visibility, sensor_connections):
     possible_solutins = []
     target_sensor_index = []
