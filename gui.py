@@ -1,23 +1,23 @@
 import pygame
 import random
 import numpy as np
-
+from algo import Node,transition,update_solution,generate_unique_groupings
 ######### SETTINGS #########
 LOG = False
-SHOW_SENSOR_RANGE = False
-SPEED = 60  # pixels per second
-TARGETS = 5  # Number of targets
-SENSORS = 15  # number of sensors
+SHOW_SENSOR_RANGE = True
+SPEED = 0  # pixels per second
+TARGETS = 3  # Number of targets
+SENSORS = 6  # number of sensors
 THRESHOLD_DISTANCE = 200  # Minimum distance between sensors
 RANGE = 360 # Sensor range
 DIRECTION_CHANGE_INTERVAL = 2.5  # Change direction every 2.5 seconds
-RATE = 500 # ms
+RATE = 2000 # ms
 TEXT_COLOR = (255, 255, 255)
 SENSOR_COLOR = (76, 145, 204)
 TARGET_COLOR = (195, 124, 63)
 RANGE_COLOR = (220, 189, 240)
 BACKGROUND_COLOR = (34, 39, 46)
-DISPLAY = (1280, 720)
+DISPLAY = (600, 600)
 ######### SETTINGS #########
 
 # Initialize pygame
@@ -55,6 +55,7 @@ for i, pos1 in enumerate(sensors_positions):
         if pos1.distance_to(pos2) <= RANGE:
             sensor_connections[i][j] = 1
             sensor_connections[j][i] = 1
+sensor_groups = generate_unique_groupings(sensor_connections)
 
 if LOG:
     print("Sensor connections matrix:")
@@ -94,8 +95,37 @@ while running:
             for i,pos_t in enumerate(target_positions):
                 for j,pos_s in enumerate(sensors_positions):
                     if pos_t.distance_to(pos_s) <= RANGE:
-                        visibility[j][i] = 1      
+                        visibility[j][i] = 1
+    
+            root = Node(
+                parent=None,
+                visibility_matrix=visibility,
+                sensor_groups=sensor_groups,
+                depth=0,
+                solution=np.zeros_like(visibility),
+            )
+            current_node = root
+            answer = root.solution
+            depth = root.depth
+            opt = len(visibility) // 3
+            while True:
+                if current_node.optimal_choices != []:
+                    updated_sensor_groups = list(current_node.sensor_groups)
+                    updated_sensor_groups.remove(current_node.optimal_choices[0][1])
+                    new_node = Node(parent=current_node, visibility_matrix=transition(current_node.visibility_matrix, current_node.optimal_choices[0]), sensor_groups= updated_sensor_groups, depth=current_node.depth + 1,solution= update_solution(current_node.solution, current_node.optimal_choices[0]))
+                    current_node.optimal_choices.remove(current_node.optimal_choices[0])
+                    current_node = new_node
 
+                    if current_node.depth > depth:
+                        answer = current_node.solution
+                        depth = current_node.depth
+                        if depth == opt:
+                            break 
+                elif current_node.optimal_choices == [] and current_node.parent is not None:
+                    current_node = current_node.parent
+                else:
+                    break
+            print(answer)
             if LOG:
                 print("Visibility matrix:")
                 print(visibility) 
