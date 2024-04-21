@@ -2,6 +2,22 @@ from itertools import combinations
 import numpy as np
 
 #sensor_connections = [
+# [1, 0, 0, 1, 0, 1],
+# [0, 1, 0, 0, 1, 1],
+# [0, 0, 1, 1, 0, 1],
+# [1, 0, 1, 1, 0, 1],
+# [0, 1, 0, 0, 1, 1],
+# [1, 1, 1, 1, 1, 1]]
+#
+#visibility = [
+# [1, 1, 1],
+# [1, 1, 0],
+# [1, 1, 1],
+# [1, 1, 1],
+# [1, 1, 0],
+# [1, 1, 1]]
+
+#sensor_connections = [
 #    [1, 0, 1, 1, 1, 1],
 #    [0, 1, 1, 0, 0, 0],
 #    [1, 1, 1, 1, 0, 0],
@@ -10,7 +26,12 @@ import numpy as np
 #    [1, 0, 0, 0, 1, 1],
 #]
 #
-#visibility = [[1, 1, 1], [1, 0, 1], [1, 0, 1], [1, 1, 1], [1, 1, 0], [1, 1, 0]]
+#visibility = [[1, 1, 1], 
+#              [1, 0, 1], 
+#              [1, 0, 1], 
+#              [1, 1, 1], 
+#              [1, 1, 0], 
+#              [1, 1, 0]]
 #
 #visibility3 = [[0, 0, 0], [1, 0, 1], [1, 0, 1], [1, 0, 1], [0, 0, 0], [0, 0, 0]]
 
@@ -18,8 +39,11 @@ import numpy as np
 def generate_unique_groupings(matrix):
     all_groupings = []
     for row in matrix:
+        #print(row)
         ones_indices = [i for i, val in enumerate(row) if val == 1]
+        #print(ones_indices)
         row_combinations = list(combinations(ones_indices, 3))
+        #print(row_combinations)
         all_groupings.extend(row_combinations)  # Extend the list instead of appending
     # Remove duplicates by converting to a set and back to a list
     unique_groupings = list(set(all_groupings))
@@ -107,15 +131,15 @@ def optimal_choices(choices, indexes, min_conflict_score):
 def get_choices(visibility, sesnor_groups):
     visibility_t = np.transpose(visibility)
     candidate_groups = generate_groupings(visibility_t)
-    # print(candidate_groups)
+    #print(candidate_groups)
     candidates = generate_candidates(candidate_groups)
-    # print(candidates)
+    #print("cand:",candidates)
     valid = valid_choices(candidate_groups, sesnor_groups)
-    # print(valid)
+    #print("valid:",valid)
     mini = min_conflict(valid)
-    # print(mini)
+    #print("mini:", mini)
     optimal = optimal_choices(valid, candidates, mini)
-    # print(optimal)
+    #print(optimal)
     return optimal
 
 
@@ -168,6 +192,7 @@ class Node:
         self.solution = solution
 #
 #sensor_groups = generate_unique_groupings(sensor_connections)
+##print("sens:",sensor_groups)
 #root = Node(
 #    parent=None,
 #    visibility_matrix=visibility,
@@ -179,24 +204,25 @@ class Node:
 #answer = root.solution
 #depth = root.depth
 #opt = len(visibility) // 3
-#
-#while True:
-#    if current_node.optimal_choices != []:
-#        updated_sensor_groups = list(current_node.sensor_groups)
-#        updated_sensor_groups.remove(current_node.optimal_choices[0][1])
-#        new_node = Node(parent=current_node, visibility_matrix=transition(current_node.visibility_matrix, current_node.optimal_choices[0]), sensor_groups= updated_sensor_groups, depth=current_node.depth + 1,solution= update_solution(current_node.solution, current_node.optimal_choices[0]))
-#        current_node.optimal_choices.remove(current_node.optimal_choices[0])
-#        current_node = new_node
-#
-#        if current_node.depth > depth:
-#            answer = current_node.solution
-#            depth = current_node.depth
-#            if depth == opt:
-#                break 
-#    elif current_node.optimal_choices == [] and current_node.parent is not None:
-#        current_node = current_node.parent
-#    else:
-#        break
+def solve_csp(current_node, depth, opt, answer):
+    while True:
+        if current_node.optimal_choices != []:
+            updated_sensor_groups = list(current_node.sensor_groups)
+            updated_sensor_groups.remove(current_node.optimal_choices[0][1])
+            new_node = Node(parent=current_node, visibility_matrix=transition(current_node.visibility_matrix, current_node.optimal_choices[0]), sensor_groups= updated_sensor_groups, depth=current_node.depth + 1,solution= update_solution(current_node.solution, current_node.optimal_choices[0]))
+            current_node.optimal_choices.remove(current_node.optimal_choices[0])
+            current_node = new_node
+            if current_node.depth > depth:
+                answer = current_node.solution
+                depth = current_node.depth
+                if depth == opt:
+                    break 
+        elif current_node.optimal_choices == [] and current_node.parent is not None:
+            current_node = current_node.parent
+        else:
+            break
+    return answer
+#print(solve_csp(root,root.depth,opt,root.solution))
 #    
 #                
 #
