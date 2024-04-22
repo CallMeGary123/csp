@@ -1,41 +1,6 @@
 from itertools import combinations
 import numpy as np
 
-#sensor_connections = [
-# [1, 0, 0, 1, 0, 1],
-# [0, 1, 0, 0, 1, 1],
-# [0, 0, 1, 1, 0, 1],
-# [1, 0, 1, 1, 0, 1],
-# [0, 1, 0, 0, 1, 1],
-# [1, 1, 1, 1, 1, 1]]
-#
-#visibility = [
-# [1, 1, 1],
-# [1, 1, 0],
-# [1, 1, 1],
-# [1, 1, 1],
-# [1, 1, 0],
-# [1, 1, 1]]
-
-#sensor_connections = [
-#    [1, 0, 1, 1, 1, 1],
-#    [0, 1, 1, 0, 0, 0],
-#    [1, 1, 1, 1, 0, 0],
-#    [1, 0, 1, 1, 0, 0],
-#    [1, 0, 0, 0, 1, 1],
-#    [1, 0, 0, 0, 1, 1],
-#]
-#
-#visibility = [[1, 1, 1], 
-#              [1, 0, 1], 
-#              [1, 0, 1], 
-#              [1, 1, 1], 
-#              [1, 1, 0], 
-#              [1, 1, 0]]
-#
-#visibility3 = [[0, 0, 0], [1, 0, 1], [1, 0, 1], [1, 0, 1], [0, 0, 0], [0, 0, 0]]
-
-
 def generate_unique_groupings(matrix):
     all_groupings = []
     for row in matrix:
@@ -190,20 +155,7 @@ class Node:
         self.optimal_choices = get_choices(visibility_matrix, sensor_groups)
         self.depth = depth
         self.solution = solution
-#
-#sensor_groups = generate_unique_groupings(sensor_connections)
-##print("sens:",sensor_groups)
-#root = Node(
-#    parent=None,
-#    visibility_matrix=visibility,
-#    sensor_groups=sensor_groups,
-#    depth=0,
-#    solution=np.zeros_like(visibility),
-#)
-#current_node = root
-#answer = root.solution
-#depth = root.depth
-#opt = len(visibility) // 3
+
 def solve_csp(current_node, depth, opt, answer):
     while True:
         if current_node.optimal_choices != []:
@@ -222,36 +174,3 @@ def solve_csp(current_node, depth, opt, answer):
         else:
             break
     return answer
-#print(solve_csp(root,root.depth,opt,root.solution))
-#    
-#                
-#
-# print(root.optimal_choices)
-# print(root.parent)
-# print(root.sensor_groups)
-# print(root.visibility_matrix)
-# print(root.solution)
-# print(root.depth)
-# del sensor_groups[sensor_groups.index((0, 4, 5))]
-# updated_sensor_groups = list(sensor_groups)
-# updated_sensor_groups.remove(root.optimal_choices[0][1])
-# node1 = Node(parent=root, visibility_matrix=transition(visibility, root.optimal_choices[0]), sensor_groups= updated_sensor_groups, depth=root.depth + 1,solution= update_solution(root.solution, root.optimal_choices[0]))
-
-# print(node1.optimal_choices)
-# print(node1.parent.sensor_groups)
-# print(node1.sensor_groups)
-# print(node1.visibility_matrix)
-# print(node1.solution)
-# print(node1.depth)
-
-
-# updated_sensor_groups1 = list(updated_sensor_groups)
-# updated_sensor_groups1.remove(node1.optimal_choices[0][1])
-# node2 = Node(parent=node1, visibility_matrix=transition(node1.visibility_matrix, node1.optimal_choices[0]), sensor_groups= updated_sensor_groups1, depth=node1.depth + 1, solution= update_solution(node1.solution, node1.optimal_choices[0]))
-
-# print(node2.optimal_choices)
-# print(node2.parent.sensor_groups)
-# print(node2.sensor_groups)
-# print(node2.visibility_matrix)
-# print(node2.solution)
-# print(node2.depth)

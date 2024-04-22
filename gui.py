@@ -1,23 +1,25 @@
+from matplotlib import lines
 import pygame
 import random
 import numpy as np
 from algo import Node,generate_unique_groupings,solve_csp
+import copy
 ######### SETTINGS #########
-LOG = True
-SHOW_SENSOR_RANGE = True
+LOG = False
+SHOW_SENSOR_RANGE = False
 SPEED = 60  # pixels per second
-TARGETS = 3  # Number of targets
-SENSORS = 6  # number of sensors
+TARGETS = 4  # Number of targets
+SENSORS = 9  # number of sensors
 THRESHOLD_DISTANCE = 200  # Minimum distance between sensors
 RANGE = 360 # Sensor range
 DIRECTION_CHANGE_INTERVAL = 2.5  # Change direction every 2.5 seconds
-RATE = 5000 # ms
+RATE = 2000 # ms
 TEXT_COLOR = (255, 255, 255)
 SENSOR_COLOR = (76, 145, 204)
 TARGET_COLOR = (195, 124, 63)
 RANGE_COLOR = (220, 189, 240)
 BACKGROUND_COLOR = (34, 39, 46)
-DISPLAY = (600, 600)
+DISPLAY = (680, 680)
 ######### SETTINGS #########
 
 # Initialize pygame
@@ -85,7 +87,8 @@ direction_change_timers = [0] * TARGETS
 # Create a custom event for getting target positions
 PRINT_TARGETS_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(PRINT_TARGETS_EVENT, RATE)
-
+drawn_lines = []
+targeted_circles = []
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -96,18 +99,34 @@ while running:
                 for j,pos_t in enumerate(target_positions):
                     if pos_t.distance_to(pos_s) <= RANGE:
                         visibility[i][j] = 1
-            root = Node(
-                parent=None,
-                visibility_matrix=visibility,
-                sensor_groups=sensor_groups,
-                depth=0,
-                solution=np.zeros_like(visibility),
-            )
-            ans = solve_csp(root,root.depth,SENSORS//3,root.solution)
             if LOG:
                 print("Visibility matrix:")
                 print(visibility) 
-                print("Target positions:")
+            try:    
+                root = Node(
+                    parent=None,
+                    visibility_matrix=visibility,
+                    sensor_groups=sensor_groups,
+                    depth=0,
+                    solution=np.zeros_like(visibility),
+                )
+                ans = solve_csp(root,root.depth,SENSORS//3,root.solution)
+                drawn_lines = []
+                targeted_circles = []
+                for i,row in enumerate(ans):
+                    for j,col in enumerate(row):
+                        if col == 1:
+                            tpos = copy.deepcopy(target_positions[j])
+                            spos = copy.deepcopy(sensors_positions[i])
+                            line = (screen, (0, 169, 0),spos,tpos, 3)
+                            circle = (screen, (169, 0, 0), tpos, 23, 3)
+                            drawn_lines.append(line)
+                            targeted_circles.append(circle)
+            except:
+                print("No solution found")
+                continue
+
+            if LOG:
                 for i, pos in enumerate(target_positions):
                     print(f"Target {i}: ({round(pos.x)}, {round(pos.y)})")
                 print("ANS\n",ans)
@@ -152,9 +171,15 @@ while running:
                 random.choice([1, 0, -1]), random.choice([1, 0, -1])
             )
             direction_change_timers[i] = 0
+
+    for line in drawn_lines:
+        pygame.draw.line(line[0],line[1],line[2],line[3],line[4])
+    for circle in targeted_circles:
+        pygame.draw.circle(circle[0],circle[1],circle[2],circle[3],circle[4])
     # Update the display
     pygame.display.flip()
     # Limit FPS to 60
     dt = clock.tick(60) / 1000
 
 pygame.quit()
+
