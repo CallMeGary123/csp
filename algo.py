@@ -1,14 +1,13 @@
 from itertools import combinations
+
 import numpy as np
+
 
 def generate_unique_groupings(matrix):
     all_groupings = []
     for row in matrix:
-        #print(row)
         ones_indices = [i for i, val in enumerate(row) if val == 1]
-        #print(ones_indices)
         row_combinations = list(combinations(ones_indices, 3))
-        #print(row_combinations)
         all_groupings.extend(row_combinations)  # Extend the list instead of appending
     # Remove duplicates by converting to a set and back to a list
     unique_groupings = list(set(all_groupings))
@@ -41,7 +40,6 @@ def conflict_score(item1, item2):
 
 
 def valid_choices(sublists, main_list):
-    # print(sublists)
     filtered_sublists = []
     for sublist in sublists:
         if sublist == []:
@@ -96,15 +94,10 @@ def optimal_choices(choices, indexes, min_conflict_score):
 def get_choices(visibility, sesnor_groups):
     visibility_t = np.transpose(visibility)
     candidate_groups = generate_groupings(visibility_t)
-    #print(candidate_groups)
     candidates = generate_candidates(candidate_groups)
-    #print("cand:",candidates)
     valid = valid_choices(candidate_groups, sesnor_groups)
-    #print("valid:",valid)
     mini = min_conflict(valid)
-    #print("mini:", mini)
     optimal = optimal_choices(valid, candidates, mini)
-    #print(optimal)
     return optimal
 
 
@@ -156,19 +149,30 @@ class Node:
         self.depth = depth
         self.solution = solution
 
+
 def solve_csp(current_node, depth, opt, answer):
     while True:
         if current_node.optimal_choices != []:
             updated_sensor_groups = list(current_node.sensor_groups)
             updated_sensor_groups.remove(current_node.optimal_choices[0][1])
-            new_node = Node(parent=current_node, visibility_matrix=transition(current_node.visibility_matrix, current_node.optimal_choices[0]), sensor_groups= updated_sensor_groups, depth=current_node.depth + 1,solution= update_solution(current_node.solution, current_node.optimal_choices[0]))
+            new_node = Node(
+                parent=current_node,
+                visibility_matrix=transition(
+                    current_node.visibility_matrix, current_node.optimal_choices[0]
+                ),
+                sensor_groups=updated_sensor_groups,
+                depth=current_node.depth + 1,
+                solution=update_solution(
+                    current_node.solution, current_node.optimal_choices[0]
+                ),
+            )
             current_node.optimal_choices.remove(current_node.optimal_choices[0])
             current_node = new_node
             if current_node.depth > depth:
                 answer = current_node.solution
                 depth = current_node.depth
                 if depth == opt:
-                    break 
+                    break
         elif current_node.optimal_choices == [] and current_node.parent is not None:
             current_node = current_node.parent
         else:

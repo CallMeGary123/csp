@@ -1,9 +1,11 @@
-from matplotlib import lines
-import pygame
-import random
-import numpy as np
-from algo import Node,generate_unique_groupings,solve_csp
 import copy
+import random
+
+import numpy as np
+import pygame
+
+from algo import Node, generate_unique_groupings, solve_csp
+
 ######### SETTINGS #########
 LOG = False
 SHOW_SENSOR_RANGE = False
@@ -11,9 +13,9 @@ SPEED = 60  # pixels per second
 TARGETS = 4  # Number of targets
 SENSORS = 9  # number of sensors
 THRESHOLD_DISTANCE = 200  # Minimum distance between sensors
-RANGE = 360 # Sensor range
+RANGE = 360  # Sensor range
 DIRECTION_CHANGE_INTERVAL = 2.5  # Change direction every 2.5 seconds
-RATE = 2000 # ms
+RATE = 2000  # ms
 TEXT_COLOR = (255, 255, 255)
 SENSOR_COLOR = (76, 145, 204)
 TARGET_COLOR = (195, 124, 63)
@@ -48,8 +50,8 @@ for i in range(SENSORS):
             sensors_positions.append(new_sensor_pos)
             break
 # Matrix init
-sensor_connections = np.zeros((SENSORS,SENSORS))
-visibility = np.zeros((SENSORS,TARGETS))
+sensor_connections = np.zeros((SENSORS, SENSORS))
+visibility = np.zeros((SENSORS, TARGETS))
 
 # Update sensor_connections matrix
 for i, pos1 in enumerate(sensors_positions):
@@ -62,7 +64,7 @@ sensor_groups = generate_unique_groupings(sensor_connections)
 if LOG:
     print("Sensor connections matrix:")
     print(sensor_connections)
-    print("Sensor positions:")        
+    print("Sensor positions:")
     for i, pos in enumerate(sensors_positions):
         print(f"Sensor {i}: ({round(pos.x)}, {round(pos.y)})")
 # Init target positions
@@ -95,14 +97,14 @@ while running:
             running = False
         elif event.type == PRINT_TARGETS_EVENT:
             # Update visibility matrix
-            for i,pos_s in enumerate(sensors_positions):
-                for j,pos_t in enumerate(target_positions):
+            for i, pos_s in enumerate(sensors_positions):
+                for j, pos_t in enumerate(target_positions):
                     if pos_t.distance_to(pos_s) <= RANGE:
                         visibility[i][j] = 1
             if LOG:
                 print("Visibility matrix:")
-                print(visibility) 
-            try:    
+                print(visibility)
+            try:
                 root = Node(
                     parent=None,
                     visibility_matrix=visibility,
@@ -110,15 +112,15 @@ while running:
                     depth=0,
                     solution=np.zeros_like(visibility),
                 )
-                ans = solve_csp(root,root.depth,SENSORS//3,root.solution)
+                ans = solve_csp(root, root.depth, SENSORS // 3, root.solution)
                 drawn_lines = []
                 targeted_circles = []
-                for i,row in enumerate(ans):
-                    for j,col in enumerate(row):
+                for i, row in enumerate(ans):
+                    for j, col in enumerate(row):
                         if col == 1:
                             tpos = copy.deepcopy(target_positions[j])
                             spos = copy.deepcopy(sensors_positions[i])
-                            line = (screen, (0, 169, 0),spos,tpos, 3)
+                            line = (screen, (0, 169, 0), spos, tpos, 3)
                             circle = (screen, (169, 0, 0), tpos, 23, 3)
                             drawn_lines.append(line)
                             targeted_circles.append(circle)
@@ -129,16 +131,18 @@ while running:
             if LOG:
                 for i, pos in enumerate(target_positions):
                     print(f"Target {i}: ({round(pos.x)}, {round(pos.y)})")
-                print("ANS\n",ans)
+                print("ANS\n", ans)
 
-    # Fill the screen 
+    # Fill the screen
     screen.fill(BACKGROUND_COLOR)
     # Draw the circles
-    for i,pos in enumerate(sensors_positions):
+    for i, pos in enumerate(sensors_positions):
         pygame.draw.circle(screen, SENSOR_COLOR, sensors_positions[i], 15)
         if SHOW_SENSOR_RANGE:
-            pygame.draw.circle(screen, RANGE_COLOR, sensors_positions[i], RANGE,width=3)
-        
+            pygame.draw.circle(
+                screen, RANGE_COLOR, sensors_positions[i], RANGE, width=3
+            )
+
         # Add id to sensors
         text_surface = font.render(str(i), True, TEXT_COLOR)  # White text
         text_rect = text_surface.get_rect(center=pos)
@@ -146,8 +150,8 @@ while running:
 
     for i, pos in enumerate(target_positions):
         pygame.draw.circle(screen, TARGET_COLOR, target_positions[i], 20)
-        target_positions[i] += movement_directions[i] * SPEED * dt 
-        
+        target_positions[i] += movement_directions[i] * SPEED * dt
+
         # Add id to targets
         text_surface = font.render(str(i), True, TEXT_COLOR)  # White text
         text_rect = text_surface.get_rect(center=pos)
@@ -173,13 +177,12 @@ while running:
             direction_change_timers[i] = 0
 
     for line in drawn_lines:
-        pygame.draw.line(line[0],line[1],line[2],line[3],line[4])
+        pygame.draw.line(line[0], line[1], line[2], line[3], line[4])
     for circle in targeted_circles:
-        pygame.draw.circle(circle[0],circle[1],circle[2],circle[3],circle[4])
+        pygame.draw.circle(circle[0], circle[1], circle[2], circle[3], circle[4])
     # Update the display
     pygame.display.flip()
     # Limit FPS to 60
     dt = clock.tick(60) / 1000
 
 pygame.quit()
-
