@@ -51,7 +51,6 @@ for i in range(SENSORS):
             break
 # Matrix init
 sensor_connections = np.zeros((SENSORS, SENSORS))
-visibility = np.zeros((SENSORS, TARGETS))
 
 # Update sensor_connections matrix
 for i, pos1 in enumerate(sensors_positions):
@@ -97,6 +96,7 @@ while running:
             running = False
         elif event.type == PRINT_TARGETS_EVENT:
             # Update visibility matrix
+            visibility = np.zeros((SENSORS, TARGETS))
             for i, pos_s in enumerate(sensors_positions):
                 for j, pos_t in enumerate(target_positions):
                     if pos_t.distance_to(pos_s) <= RANGE:
