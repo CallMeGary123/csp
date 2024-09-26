@@ -1,6 +1,6 @@
 <h1 style="text-align: center;">Constraint Satisfaction Problem (AI)</h1>
 <p>This is a proof of concept project meant to solve a csp problem without the use of existing libraries such as <a href="https://github.com/python-constraint/python-constraint">python-constraint</a>.</p>
-<img src= "screenshots\screenshot1.png">
+<img src= "screenshots\Screenshot1.png">
 <h2>Content</h2>
 <ul>
     <li><a href = "#goal">Goal</a></li>
