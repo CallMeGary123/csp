@@ -125,7 +125,8 @@ while running:
                             drawn_lines.append(line)
                             targeted_circles.append(circle)
             except:
-                print("No solution found")
+                if LOG:
+                    print("No solution found")
                 continue
 
             if LOG:
